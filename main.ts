@@ -14,7 +14,7 @@ const redBold = (text: string) => red(bold(text));
 
 const buildTemplate = async (gitUrl: string) => {
   try {
-    await exec(`pnpx degit ${gitUrl}`);
+    await exec(`pnpm -dlx degit ${gitUrl}`);
     await exec("pnpm install");
   } catch (e) {
     console.log(redBold("ERROR creating repo"), e);
