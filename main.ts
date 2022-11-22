@@ -1,9 +1,15 @@
 import { parse } from "https://deno.land/std@0.119.0/flags/mod.ts";
 
-import { redBold, green, buildTemplate, executeComand } from "./utils.ts";
+import {
+  redBold,
+  green,
+  executeComand,
+  tigedProject,
+  installProject,
+} from "./utils.ts";
 
 const GITHUB_NEXT_GREEN_TEMPLATE_URL =
-  "git@github.com:enverse/next-green-template.git";
+  "git@gitlab.com:enverse-labs/next-green-template.git";
 const GITHUB_VITE_GREEN_TEMPLATE_URL =
   "git@github.com:enverse/vite-green-template.git";
 
@@ -43,22 +49,29 @@ const girlUrl =
     ? GITHUB_NEXT_GREEN_TEMPLATE_URL
     : GITHUB_VITE_GREEN_TEMPLATE_URL;
 
-await buildTemplate(girlUrl, projectName);
+await executeComand(["mkdir", projectName]);
 
+await tigedProject(girlUrl, projectName);
 if (withDocker) {
   try {
-    await executeComand(`pnpm dlx tiged ${GITLAB_DOCKER_TEMPLATE_URL}`);
+    await tigedProject(GITLAB_DOCKER_TEMPLATE_URL, `./${projectName}/tmp`);
+    await executeComand(
+      ["mv", "./tmp/docker", "./tmp/Makefile", "./tmp/.gitlab-ci.yml", "./"],
+      projectName
+    );
+    await executeComand(["rm", "-rf", "./tmp"], projectName);
+
+    // await executeComand(["echo", `${degitConfig}`, ">>", "degit.json"]);
   } catch (e) {
     console.log(redBold(e));
     Deno.exit(1);
   }
 }
+await installProject(projectName);
 
-await executeComand("git init", projectName);
-await executeComand(
-  `echo ${green(
-    "welcome to your new green project :) start eco-desiginin away !!"
-  )}`
-);
-// console.log(green("Start eco designing away :)"));
+await executeComand(["git", "init"], projectName);
+await executeComand([
+  "echo",
+  green("welcome to your new green project :) start eco-desiginin away !!"),
+]);
 Deno.exit();
