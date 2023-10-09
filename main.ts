@@ -8,10 +8,17 @@ import {
   installProject,
 } from "./utils.ts";
 
+
 const GITHUB_NEXT_GREEN_TEMPLATE_URL =
   "git@gitlab.com:enverse-labs/next-green-template.git";
 const GITHUB_VITE_GREEN_TEMPLATE_URL =
   "git@github.com:enverse/vite-green-template.git";
+
+  const templates: {[key: string]: string} = {
+    "next-basic": "git@gitlab.com:enverse-labs/next-green-template.git",
+    "vite-basic": "git@github.com:enverse/vite-green-template.git",
+    "next-supabase-router": "git@gitlab.com:enverse-labs/green-templates/next-green-template-app-router-supabase.git"
+  }
 
 const GITLAB_DOCKER_TEMPLATE_URL =
   "git@gitlab.com:enverse-labs/docker-template.git";
@@ -30,17 +37,16 @@ const flags = parse(Deno.args, {
     "with-docker": "d",
     framework: "f",
   },
-  default: { "with-docker": false, framework: "next" },
+  default: { "with-docker": false, framework: "next-basic" },
 });
 
-const possibleFrameworks: Array<"vite" | "next"> = ["vite", "next"];
 
 const withDocker = flags["with-docker"];
 const { framework } = flags;
 
-if (possibleFrameworks.indexOf(flags.framework) === -1) {
+if (!templates[flags.framework]) {
   console.log(
-    redBold(`The only accepted frameworks are ${possibleFrameworks.join(",")}`)
+    redBold(`The only accepted frameworks are ${Object.keys(templates).join(",")}`)
   );
 }
 
