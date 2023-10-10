@@ -17,7 +17,7 @@ const templates: { [key: string]: string } = {
     "git@gitlab.com:enverse-labs/green-templates/next-green-template.git",
   "vite-basic": "git@github.com:enverse/vite-green-template.git",
   "next-supabase-app-router":
-    "git@gitlab.com:enverse-labs/green-templates/next-green-template-app-router-supabase.git",
+    "git@gitlab.com:enverse-labs/next-green-template-app-router-supabase.git",
 };
 
 const GITLAB_DOCKER_TEMPLATE_URL =
@@ -99,7 +99,7 @@ await executeComand(["git", "init"], projectName);
 await executeComand(
   [
     "echo",
-    green("welcome to your new green project :) start eco-desiginin away !!"),
+    green("welcome to your new green project :) start eco-designing away !!"),
   ],
 );
 Deno.exit();

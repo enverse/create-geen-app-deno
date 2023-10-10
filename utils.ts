@@ -1,29 +1,11 @@
 import { bold, green, red } from "https://deno.land/std@0.203.0/fmt/colors.ts";
-import tiged from "npm:tiged";
+import tiged from "npm:tiged@2.12.5";
 
 const redBold = (text: string) => red(bold(text));
 
 const commandError = (command: string, error: string) => {
   console.log(red(`Command \n ${redBold(command)} \n failed with: ${error}`));
 };
-
-/* https://github.com/gpasq/deno-exec/blob/master/mod.ts#L3 */
-// const splitCommand = (command: string): string[] => {
-//   const myRegexp = /[^\s"]+|"([^"]*)"/gi;
-//   const splits = [];
-
-//   do {
-//     const match = myRegexp.exec(command);
-//     //Each call to exec returns the next regex match as an array
-//     if (match != null) {
-//       //Index 1 in the array is the captured group if it exists
-//       //Index 0 is the matched text, which we use if no captured group exists
-//       splits.push(match[1] ? match[1] : match[0]);
-//     }
-//   } while (match != null);
-
-//   return splits;
-// };
 
 const executeComand = async (isntructions: string[], cwd = "./") => {
   //   const splits = splitCommand(command);
@@ -70,7 +52,7 @@ const installProject = async (dest: string) => {
 
 const tigedProject = async (url: string, dest: string, shouldForce = false) => {
   try {
-    const emitter = tiged(url, { force: shouldForce });
+    const emitter = tiged(url, { force: shouldForce, subgroup: true });
     await emitter.clone(dest);
     await executeComand(
       ["echo", `${green(`installed project from: ${url} in ${dest}`)}`],
