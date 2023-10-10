@@ -1,4 +1,4 @@
-import { green, red, bold } from "https://deno.land/std@0.123.0/fmt/colors.ts";
+import { bold, green, red } from "https://deno.land/std@0.203.0/fmt/colors.ts";
 import tiged from "npm:tiged";
 
 const redBold = (text: string) => red(bold(text));
@@ -25,31 +25,31 @@ const commandError = (command: string, error: string) => {
 //   return splits;
 // };
 
-const executeComand = async (command: string[], cwd = "./") => {
+const executeComand = async (isntructions: string[], cwd = "./") => {
   //   const splits = splitCommand(command);
+  const [command, ...args] = isntructions;
+
   try {
-    const process = Deno.run({
-      cmd: command,
+    const executableCommand = new Deno.Command(command, {
+      args,
       stdout: "piped",
       stderr: "piped",
       cwd,
     });
 
-    const { code } = await process.status();
+    const { success, stdout, stderr } = await executableCommand.output();
 
     // Reading the outputs closes their pipes
-    const rawOutput = await process.output();
-    const rawError = await process.stderrOutput();
 
-    if (code === 0) {
-      await Deno.stdout.write(rawOutput);
+    if (success) {
+      await Deno.stdout.write(stdout);
     } else {
-      const errorString = new TextDecoder().decode(rawError);
-      commandError(command.join(" "), errorString);
+      const errorString = new TextDecoder().decode(stderr);
+      commandError(command, errorString);
       Deno.exit(1);
     }
   } catch (e) {
-    commandError(command.join(" "), e);
+    commandError(command, e);
     Deno.exit(1);
   }
 };
@@ -60,9 +60,9 @@ const installProject = async (dest: string) => {
   } catch (e) {
     console.log(
       redBold(
-        `ERROR isntalling dependecies, run npm/yarn/pnpm install in ${dest}`
+        `ERROR isntalling dependecies, run npm/yarn/pnpm install in ${dest}`,
       ),
-      e
+      e,
     );
     Deno.exit(1);
   }
@@ -72,10 +72,9 @@ const tigedProject = async (url: string, dest: string, shouldForce = false) => {
   try {
     const emitter = tiged(url, { force: shouldForce });
     await emitter.clone(dest);
-    await executeComand([
-      "echo",
-      `${green(`installed project from: ${url} in ${dest}`)}`,
-    ]);
+    await executeComand(
+      ["echo", `${green(`installed project from: ${url} in ${dest}`)}`],
+    );
   } catch (e) {
     console.log(red(`Error getting project from: \n\t${redBold(url)}\n`));
     console.log(red(`Message: \n\t${redBold(e.message)}\n`));
@@ -84,4 +83,4 @@ const tigedProject = async (url: string, dest: string, shouldForce = false) => {
   }
 };
 
-export { redBold, installProject, green, executeComand, tigedProject };
+export { executeComand, green, installProject, redBold, tigedProject };
